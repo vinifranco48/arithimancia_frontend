@@ -1,0 +1,78 @@
+import { KingdomData, KingdomNode } from '@/types/kingdom';
+
+const algebraNodes: KingdomNode[] = [
+  // ATO I: A Torre Algébrica (1-10)
+  { id: 1, type: 'npc', title: 'Encontro com Al-Khwarizmi', description: 'O pai da álgebra aguarda na Torre', kingdom: 'algebrista', act: 1, position: { x: 50, y: 10 }, requiredLevel: 1, locked: false, completed: false, npcId: 'al-khwarizmi', rewards: { xp: 50, axiom: 'Axioma do Equilíbrio' } },
+  { id: 2, type: 'battle', title: 'Variável X Fugitiva', description: 'Uma incógnita que não quer ser isolada', kingdom: 'algebrista', act: 1, position: { x: 50, y: 18 }, requiredLevel: 1, locked: false, completed: false, enemyId: 'variavel_fugitiva', rewards: { xp: 100, gold: 50 }, challenge: { question: 'Resolva: x + 5 = 12. Quanto vale x?', answer: 7, hint: 'Subtraia 5 de ambos os lados', difficulty: 'easy' } },
+  { id: 3, type: 'npc', title: 'Al-Khwarizmi - Lição 2', description: 'Equações básicas e balanço', kingdom: 'algebrista', act: 1, position: { x: 40, y: 26 }, requiredLevel: 1, locked: false, completed: false, npcId: 'al-khwarizmi', rewards: { xp: 75, axiom: 'Axioma da Multiplicação' } },
+  { id: 4, type: 'battle', title: 'Equação Incompleta', description: 'Uma equação sem solução válida', kingdom: 'algebrista', act: 1, position: { x: 60, y: 26 }, requiredLevel: 2, locked: true, completed: false, enemyId: 'equacao_incompleta', rewards: { xp: 150, gold: 75 }, challenge: { question: 'Resolva: 2x = 10. Quanto vale x?', answer: 5, hint: 'Divida ambos os lados por 2', difficulty: 'easy' } },
+  { id: 5, type: 'puzzle', title: 'Balança do Equilíbrio', description: 'Mantenha a balança em equilíbrio', kingdom: 'algebrista', act: 1, position: { x: 50, y: 34 }, requiredLevel: 2, locked: true, completed: false, puzzleType: 'equation_balance', rewards: { xp: 200, theorem: 'Teorema do Equilíbrio' }, challenge: { question: 'Se x + 3 = 10, então x = ?', answer: 7, hint: 'O que somado a 3 dá 10?', difficulty: 'easy' } },
+  { id: 6, type: 'battle', title: 'Termo Semelhante Hostil', description: 'Termos que se recusam a combinar', kingdom: 'algebrista', act: 1, position: { x: 35, y: 42 }, requiredLevel: 2, locked: true, completed: false, enemyId: 'termo_semelhante_hostil', rewards: { xp: 150, gold: 100 } },
+  { id: 7, type: 'npc', title: 'Emmy Noether - Propriedades', description: 'A mestra ensina propriedades algébricas', kingdom: 'algebrista', act: 1, position: { x: 50, y: 50 }, requiredLevel: 3, locked: true, completed: false, npcId: 'emmy_noether', rewards: { xp: 100, theorem: 'Propriedade Distributiva' } },
+  { id: 8, type: 'battle', title: 'Balança Desequilibrada', description: 'Uma equação que nunca se iguala', kingdom: 'algebrista', act: 1, position: { x: 65, y: 50 }, requiredLevel: 3, locked: true, completed: false, enemyId: 'balanca_desequilibrada', rewards: { xp: 200, gold: 150 }, challenge: { question: 'Simplifique: 2(x + 3) = 2x + ?', answer: 6, hint: 'Use a propriedade distributiva', difficulty: 'medium' } },
+  { id: 9, type: 'treasure', title: 'Manuscrito de Al-Khwarizmi', description: 'O tratado original "Al-Jabr"', kingdom: 'algebrista', act: 1, position: { x: 50, y: 58 }, requiredLevel: 3, locked: true, completed: false, rewards: { xp: 250, gold: 200, item: 'Tratado Al-Jabr' } },
+  { id: 10, type: 'boss', title: 'Enxame de Variáveis', description: 'Múltiplas variáveis entrelaçadas', kingdom: 'algebrista', act: 1, position: { x: 50, y: 66 }, requiredLevel: 4, locked: true, completed: false, isBoss: true, enemyId: 'variavel_multiplicada_boss', rewards: { xp: 500, gold: 300 }, activatesBeacon: true, beaconName: 'Farol Axiomático I - Torre', challenge: { question: 'Resolva: 3x + 6 = 15. x = ?', answer: 3, hint: 'Primeiro subtraia 6, depois divida por 3', difficulty: 'medium' } },
+
+  // ATO II: Deserto das Incógnitas (11-20)
+  { id: 11, type: 'story', title: 'Entrada no Deserto', description: 'Variáveis perdidas vagam pelas dunas', kingdom: 'algebrista', act: 2, position: { x: 50, y: 74 }, requiredLevel: 4, locked: true, completed: false, rewards: { xp: 0 }, storyContent: ['O Farol se acende. Dunas de equações se estendem à frente.', 'Variáveis perdidas flutuam sem valor atribuído.', 'No horizonte, expoentes crescem descontroladamente.'] },
+  { id: 12, type: 'npc', title: 'Brahmagupta - Números Negativos', description: 'O mestre dos negativos e do zero', kingdom: 'algebrista', act: 2, position: { x: 35, y: 82 }, requiredLevel: 4, locked: true, completed: false, npcId: 'brahmagupta_algebra', rewards: { xp: 150, theorem: 'Teorema dos Negativos' } },
+  { id: 13, type: 'battle', title: 'Expoente Descontrolado', description: 'Um expoente que cresce exponencialmente', kingdom: 'algebrista', act: 2, position: { x: 45, y: 90 }, requiredLevel: 5, locked: true, completed: false, enemyId: 'expoente_descontrolado', rewards: { xp: 200, gold: 150 }, challenge: { question: 'Calcule: 2³ = ?', answer: 8, hint: '2 × 2 × 2', difficulty: 'easy' } },
+  { id: 14, type: 'puzzle', title: 'Oásis das Potências', description: 'Domine as leis dos expoentes', kingdom: 'algebrista', act: 2, position: { x: 55, y: 90 }, requiredLevel: 5, locked: true, completed: false, puzzleType: 'exponent_rules', rewards: { xp: 250, theorem: 'Leis dos Expoentes' } },
+  { id: 15, type: 'npc', title: 'Galois - Equações Quadráticas', description: 'O jovem gênio ensina polinômios', kingdom: 'algebrista', act: 2, position: { x: 65, y: 82 }, requiredLevel: 5, locked: true, completed: false, npcId: 'galois', rewards: { xp: 175 } },
+  { id: 16, type: 'battle', title: 'Raiz Quadrada Negativa', description: 'Uma √-1 impossível', kingdom: 'algebrista', act: 2, position: { x: 50, y: 98 }, requiredLevel: 6, locked: true, completed: false, enemyId: 'raiz_quadrada_negativa', rewards: { xp: 250, gold: 200 }, challenge: { question: 'Resolva: x² = 16. Solução positiva?', answer: 4, hint: '√16 = ?', difficulty: 'medium' } },
+  { id: 17, type: 'puzzle', title: 'Templo da Fatoração', description: 'Fatore polinômios quadráticos', kingdom: 'algebrista', act: 2, position: { x: 65, y: 98 }, requiredLevel: 6, locked: true, completed: false, puzzleType: 'factorization', rewards: { xp: 300 } },
+  { id: 18, type: 'npc', title: 'Galois - Teoria dos Grupos', description: 'Simetrias ocultas nas equações', kingdom: 'algebrista', act: 2, position: { x: 35, y: 106 }, requiredLevel: 6, locked: true, completed: false, npcId: 'galois', rewards: { xp: 200, theorem: 'Teoria de Galois Básica' } },
+  { id: 19, type: 'battle', title: 'Fator Comum Oculto', description: 'Um fator escondido na expressão', kingdom: 'algebrista', act: 2, position: { x: 65, y: 106 }, requiredLevel: 7, locked: true, completed: false, enemyId: 'fator_comum_oculto', rewards: { xp: 300, gold: 250 } },
+  { id: 20, type: 'boss', title: 'Infinito Selvagem Algébrico', description: 'Um limite que tende ao infinito', kingdom: 'algebrista', act: 2, position: { x: 50, y: 114 }, requiredLevel: 7, locked: true, completed: false, isBoss: true, bossPhases: 2, enemyId: 'infinito_selvagem_boss', rewards: { xp: 600, gold: 400 }, activatesBeacon: true, beaconName: 'Farol Axiomático II - Deserto', challenge: { question: 'Fatore: x² - 9 = (x+3)(x-?)', answer: 3, hint: 'Diferença de quadrados', difficulty: 'hard' } },
+
+  // ATO III: Cidade dos Símbolos (21-30)
+  { id: 21, type: 'story', title: 'Chegada à Cidade', description: 'Símbolos matemáticos formam torres', kingdom: 'algebrista', act: 3, position: { x: 50, y: 122 }, requiredLevel: 8, locked: true, completed: false, rewards: { xp: 0 }, storyContent: ['A Cidade dos Símbolos se revela.', 'Funções e gráficos formam arquitetura viva.', 'Viète aguarda no Scriptorium Central.'] },
+  { id: 22, type: 'npc', title: 'François Viète - Sistemas', description: 'O pai da notação moderna', kingdom: 'algebrista', act: 3, position: { x: 40, y: 130 }, requiredLevel: 8, locked: true, completed: false, npcId: 'viete', rewards: { xp: 200, theorem: 'Sistemas de Equações' } },
+  { id: 23, type: 'battle', title: 'Função Irracional Corrompida', description: 'Uma função que não pode ser expressa', kingdom: 'algebrista', act: 3, position: { x: 45, y: 138 }, requiredLevel: 8, locked: true, completed: false, enemyId: 'funcao_irracional', rewards: { xp: 300, gold: 250 } },
+  { id: 24, type: 'puzzle', title: 'Jardim dos Sistemas', description: 'Resolva sistemas lineares', kingdom: 'algebrista', act: 3, position: { x: 55, y: 138 }, requiredLevel: 9, locked: true, completed: false, puzzleType: 'linear_systems', rewards: { xp: 350, theorem: 'Método de Substituição' } },
+  { id: 25, type: 'npc', title: 'Descartes - Funções', description: 'Funções e coordenadas', kingdom: 'algebrista', act: 3, position: { x: 60, y: 130 }, requiredLevel: 9, locked: true, completed: false, npcId: 'descartes_algebra', rewards: { xp: 250, theorem: 'Funções Algébricas' } },
+  { id: 26, type: 'battle', title: 'Logaritmo Invertido', description: 'Um logaritmo com base negativa', kingdom: 'algebrista', act: 3, position: { x: 50, y: 146 }, requiredLevel: 9, locked: true, completed: false, enemyId: 'logaritmo_invertido', rewards: { xp: 350, gold: 300 }, challenge: { question: 'Se f(x) = 2x + 1 e x = 3, f(3) = ?', answer: 7, hint: 'Substitua: 2(3) + 1', difficulty: 'medium' } },
+  { id: 27, type: 'puzzle', title: 'Galeria das Funções', description: 'Identifique tipos de funções', kingdom: 'algebrista', act: 3, position: { x: 65, y: 146 }, requiredLevel: 10, locked: true, completed: false, puzzleType: 'function_types', rewards: { xp: 400, theorem: 'Classificação de Funções' } },
+  { id: 28, type: 'battle', title: 'Matriz Singular', description: 'Uma matriz sem inversa', kingdom: 'algebrista', act: 3, position: { x: 35, y: 154 }, requiredLevel: 10, locked: true, completed: false, enemyId: 'matriz_singular', rewards: { xp: 400, gold: 350 } },
+  { id: 29, type: 'treasure', title: 'Compêndio de Viète', description: 'A notação simbólica original', kingdom: 'algebrista', act: 3, position: { x: 50, y: 162 }, requiredLevel: 10, locked: true, completed: false, rewards: { xp: 500, gold: 400, item: 'Compêndio Simbólico' } },
+  { id: 30, type: 'boss', title: 'Sistema Inconsistente', description: 'Equações sem solução possível', kingdom: 'algebrista', act: 3, position: { x: 50, y: 170 }, requiredLevel: 11, locked: true, completed: false, isBoss: true, bossPhases: 3, enemyId: 'sistema_inconsistente_boss', rewards: { xp: 800, gold: 500 }, activatesBeacon: true, beaconName: 'Farol Axiomático III - Cidade' },
+
+  // ATO IV: Laboratório Algébrico (31-40)
+  { id: 31, type: 'story', title: 'Portal para o Laboratório', description: 'A origem da Equação da Impossibilidade', kingdom: 'algebrista', act: 4, position: { x: 50, y: 178 }, requiredLevel: 12, locked: true, completed: false, rewards: { xp: 0 }, storyContent: ['O portal se abre para o Laboratório.', 'Equações impossíveis flutuam no ar.', 'A Equação da Impossibilidade pulsa no centro.'] },
+  { id: 32, type: 'npc', title: 'Al-Khwarizmi - Libertação', description: 'Ritual de libertação do mestre', kingdom: 'algebrista', act: 4, position: { x: 40, y: 186 }, requiredLevel: 12, locked: true, completed: false, npcId: 'al-khwarizmi', rewards: { xp: 300, axiom: 'Axiomas Completos da Álgebra' } },
+  { id: 33, type: 'battle', title: 'Polinômio Insolúvel', description: 'Um polinômio de grau 5', kingdom: 'algebrista', act: 4, position: { x: 45, y: 194 }, requiredLevel: 12, locked: true, completed: false, enemyId: 'polinomio_insoluvel', rewards: { xp: 450, gold: 400 } },
+  { id: 34, type: 'puzzle', title: 'Sala das Equações Perdidas', description: 'Reconstrua equações fundamentais', kingdom: 'algebrista', act: 4, position: { x: 55, y: 194 }, requiredLevel: 13, locked: true, completed: false, puzzleType: 'equation_reconstruction', rewards: { xp: 500, theorem: 'Teorema das Raízes' } },
+  { id: 35, type: 'battle', title: 'Grupo Abeliano Corrupto', description: 'Estrutura algébrica corrompida', kingdom: 'algebrista', act: 4, position: { x: 50, y: 202 }, requiredLevel: 13, locked: true, completed: false, enemyId: 'grupo_abeliano_corrupto', rewards: { xp: 500, gold: 450 } },
+  { id: 36, type: 'puzzle', title: 'Câmara da Álgebra Abstrata', description: 'Estruturas algébricas avançadas', kingdom: 'algebrista', act: 4, position: { x: 65, y: 202 }, requiredLevel: 13, locked: true, completed: false, puzzleType: 'abstract_algebra', rewards: { xp: 600, theorem: 'Teoria dos Anéis' } },
+  { id: 37, type: 'battle', title: 'Anel sem Identidade', description: 'Um anel sem elemento neutro', kingdom: 'algebrista', act: 4, position: { x: 35, y: 210 }, requiredLevel: 14, locked: true, completed: false, enemyId: 'anel_sem_identidade', rewards: { xp: 550, gold: 500 } },
+  { id: 38, type: 'npc', title: 'Eco do Último Matemático', description: 'A verdade sobre a Equação', kingdom: 'algebrista', act: 4, position: { x: 50, y: 218 }, requiredLevel: 14, locked: true, completed: false, npcId: 'al-khwarizmi', rewards: { xp: 400 } },
+  { id: 39, type: 'battle', title: 'Guardiões Simbólicos', description: 'Símbolos algébricos corrompidos', kingdom: 'algebrista', act: 4, position: { x: 50, y: 226 }, requiredLevel: 15, locked: true, completed: false, enemyId: 'guardioes_simbolicos', rewards: { xp: 700, gold: 600 } },
+  { id: 40, type: 'boss', title: 'A Equação da Impossibilidade', description: 'A equação que quebrou a Rede', kingdom: 'algebrista', act: 4, position: { x: 50, y: 234 }, requiredLevel: 15, locked: true, completed: false, isBoss: true, bossPhases: 4, enemyId: 'equacao_impossibilidade', rewards: { xp: 1500, gold: 1000, theorem: 'Grande Teorema de Restauração Algébrica' }, activatesBeacon: true, beaconName: 'Rede Matemática Restaurada' }
+];
+
+export const algebraKingdom: KingdomData = {
+  id: 'algebrista',
+  name: 'algebrista',
+  displayName: 'Reino da Álgebra',
+  description: 'Reconstrua o Grande Livro de Equações e restaure o equilíbrio algébrico',
+  loreIntro: [
+    'O Grande Livro de Equações foi rasgado pelo Paradoxo Zero.',
+    'Variáveis fugiram de suas equações, constantes se tornaram variáveis,',
+    'e o símbolo "=" perdeu seu significado.',
+    'Al-Khwarizmi, petrificado em sua torre algébrica, espera um Algebrista',
+    'que possa resolver a Equação Primordial e devolver o equilíbrio ao mundo.'
+  ],
+  icon: '🧮',
+  color: 'purple',
+  gradient: 'from-purple-600 to-violet-600',
+  nodes: algebraNodes,
+  npcs: ['al-khwarizmi', 'emmy_noether', 'galois', 'viete', 'brahmagupta_algebra', 'descartes_algebra'],
+  enemies: ['variavel_fugitiva', 'equacao_incompleta', 'termo_semelhante_hostil', 'balanca_desequilibrada', 'variavel_multiplicada_boss', 'expoente_descontrolado', 'raiz_quadrada_negativa', 'fator_comum_oculto', 'infinito_selvagem_boss', 'funcao_irracional', 'logaritmo_invertido', 'matriz_singular', 'sistema_inconsistente_boss', 'polinomio_insoluvel', 'grupo_abeliano_corrupto', 'anel_sem_identidade', 'guardioes_simbolicos', 'equacao_impossibilidade'],
+  totalActs: 4,
+  estimatedPlaytime: '20-25 horas',
+  endings: [
+    { id: 'rigid_order', name: 'Ordem Algébrica Plena', description: 'Todas as equações têm solução exata', requirement: 'Escolher axiomas clássicos' },
+    { id: 'flexible_algebra', name: 'Álgebra Flexível', description: 'Permitir soluções aproximadas controladas', requirement: 'Aceitar zonas de aproximação' },
+    { id: 'new_axiomatics', name: 'Nova Álgebra', description: 'Criar um novo sistema algébrico unificado', requirement: 'Propor novos axiomas' }
+  ]
+};

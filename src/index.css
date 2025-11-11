@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 270 50% 5%;
+    --foreground: 270 20% 95%;
+
+    --card: 270 40% 8%;
+    --card-foreground: 270 20% 95%;
+
+    --popover: 270 45% 6%;
+    --popover-foreground: 270 20% 95%;
+
+    --primary: 270 80% 60%;
+    --primary-foreground: 270 10% 5%;
+
+    --secondary: 280 70% 45%;
+    --secondary-foreground: 270 20% 95%;
+
+    --muted: 270 30% 15%;
+    --muted-foreground: 270 15% 60%;
+
+    --accent: 290 75% 55%;
+    --accent-foreground: 270 10% 5%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 270 20% 95%;
+
+    --border: 270 40% 20%;
+    --input: 270 40% 15%;
+    --ring: 270 80% 60%;
+
+    --radius: 0.75rem;
+
+    /* Arithimancia specific colors */
+    --mystic-purple: 270 80% 60%;
+    --deep-purple: 270 60% 35%;
+    --void-black: 270 50% 5%;
+    --number-glow: 280 90% 70%;
+    --equation-shimmer: 290 85% 65%;
+    
+    /* Duolingo-style vibrant colors */
+    --duo-green: 140 70% 50%;
+    --duo-green-light: 140 60% 60%;
+    --duo-blue: 210 90% 55%;
+    --duo-yellow: 45 95% 60%;
+    --duo-red: 0 75% 60%;
+    --duo-purple: 270 70% 65%;
+    --duo-orange: 25 95% 55%;
+    --duo-gray: 220 10% 85%;
+    
+    /* Lore colors */
+    --algebra-primary: 260 80% 60%;
+    --algebra-secondary: 280 70% 50%;
+    --geometry-primary: 200 85% 55%;
+    --geometry-secondary: 180 75% 50%;
+    --combinatorics-primary: 30 90% 55%;
+    --combinatorics-secondary: 45 85% 50%;
+    
+    /* Gradients */
+    --gradient-mystic: linear-gradient(135deg, hsl(270 80% 60%), hsl(280 70% 45%));
+    --gradient-void: linear-gradient(180deg, hsl(270 50% 5%), hsl(270 40% 8%));
+    --gradient-danger: linear-gradient(135deg, hsl(0 70% 50%), hsl(330 60% 45%));
+    --gradient-duolingo: linear-gradient(180deg, hsl(140 70% 50%), hsl(140 65% 45%));
+    
+    /* Shadows and effects */
+    --glow-purple: 0 0 30px hsl(270 80% 60% / 0.5);
+    --glow-intense: 0 0 50px hsl(280 90% 70% / 0.7);
+    --shadow-deep: 0 10px 40px hsl(270 50% 5% / 0.8);
+    --shadow-node: 0 8px 24px hsl(270 50% 5% / 0.3);
+  }
+
+  .dark {
+    --background: 270 50% 5%;
+    --foreground: 270 20% 95%;
+
+    --card: 270 40% 8%;
+    --card-foreground: 270 20% 95%;
+
+    --popover: 270 45% 6%;
+    --popover-foreground: 270 20% 95%;
+
+    --primary: 270 80% 60%;
+    --primary-foreground: 270 10% 5%;
+
+    --secondary: 280 70% 45%;
+    --secondary-foreground: 270 20% 95%;
+
+    --muted: 270 30% 15%;
+    --muted-foreground: 270 15% 60%;
+
+    --accent: 290 75% 55%;
+    --accent-foreground: 270 10% 5%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 270 20% 95%;
+
+    --border: 270 40% 20%;
+    --input: 270 40% 15%;
+    --ring: 270 80% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 20px hsl(var(--number-glow));
+  }
+  
+  .text-glow-intense {
+    text-shadow: 0 0 30px hsl(var(--number-glow)), 0 0 60px hsl(var(--mystic-purple));
+  }
+  
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulseGlow {
+    0%, 100% {
+      opacity: 1;
+      filter: drop-shadow(0 0 10px hsl(var(--number-glow)));
+    }
+    50% {
+      opacity: 0.8;
+      filter: drop-shadow(0 0 20px hsl(var(--number-glow)));
+    }
+  }
+  
+  .bg-gradient-mystic {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+  }
+
+  .bg-gradient-void {
+    background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--card)));
+  }
+
+  /* Fix for gradient text - ensure bg-clip-text works properly */
+  .bg-clip-text {
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+  }
+
+  /* Utility class for gradient text that works properly */
+  .text-gradient-mystic {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+  }
+}
