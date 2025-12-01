@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
     --background: 270 50% 5%;
@@ -44,7 +40,7 @@ All colors MUST be HSL.
     --void-black: 270 50% 5%;
     --number-glow: 280 90% 70%;
     --equation-shimmer: 290 85% 65%;
-    
+
     /* Duolingo-style vibrant colors */
     --duo-green: 140 70% 50%;
     --duo-green-light: 140 60% 60%;
@@ -54,53 +50,25 @@ All colors MUST be HSL.
     --duo-purple: 270 70% 65%;
     --duo-orange: 25 95% 55%;
     --duo-gray: 220 10% 85%;
-    
-    /* Lore colors */
-    --algebra-primary: 260 80% 60%;
-    --algebra-secondary: 280 70% 50%;
-    --geometry-primary: 200 85% 55%;
-    --geometry-secondary: 180 75% 50%;
-    --combinatorics-primary: 30 90% 55%;
-    --combinatorics-secondary: 45 85% 50%;
-    
-    /* Gradients */
-    --gradient-mystic: linear-gradient(135deg, hsl(270 80% 60%), hsl(280 70% 45%));
-    --gradient-void: linear-gradient(180deg, hsl(270 50% 5%), hsl(270 40% 8%));
-    --gradient-danger: linear-gradient(135deg, hsl(0 70% 50%), hsl(330 60% 45%));
-    --gradient-duolingo: linear-gradient(180deg, hsl(140 70% 50%), hsl(140 65% 45%));
-    
-    /* Shadows and effects */
-    --glow-purple: 0 0 30px hsl(270 80% 60% / 0.5);
-    --glow-intense: 0 0 50px hsl(280 90% 70% / 0.7);
-    --shadow-deep: 0 10px 40px hsl(270 50% 5% / 0.8);
-    --shadow-node: 0 8px 24px hsl(270 50% 5% / 0.3);
   }
 
   .dark {
     --background: 270 50% 5%;
     --foreground: 270 20% 95%;
-
     --card: 270 40% 8%;
     --card-foreground: 270 20% 95%;
-
     --popover: 270 45% 6%;
     --popover-foreground: 270 20% 95%;
-
     --primary: 270 80% 60%;
     --primary-foreground: 270 10% 5%;
-
     --secondary: 280 70% 45%;
     --secondary-foreground: 270 20% 95%;
-
     --muted: 270 30% 15%;
     --muted-foreground: 270 15% 60%;
-
     --accent: 290 75% 55%;
     --accent-foreground: 270 10% 5%;
-
     --destructive: 0 70% 50%;
     --destructive-foreground: 270 20% 95%;
-
     --border: 270 40% 20%;
     --input: 270 40% 15%;
     --ring: 270 80% 60%;
@@ -122,26 +90,29 @@ All colors MUST be HSL.
   .text-glow {
     text-shadow: 0 0 20px hsl(var(--number-glow));
   }
-  
+
   .text-glow-intense {
     text-shadow: 0 0 30px hsl(var(--number-glow)), 0 0 60px hsl(var(--mystic-purple));
   }
-  
+
   .animate-pulse-glow {
     animation: pulseGlow 2s ease-in-out infinite;
   }
-  
+
   @keyframes pulseGlow {
-    0%, 100% {
+
+    0%,
+    100% {
       opacity: 1;
       filter: drop-shadow(0 0 10px hsl(var(--number-glow)));
     }
+
     50% {
       opacity: 0.8;
       filter: drop-shadow(0 0 20px hsl(var(--number-glow)));
     }
   }
-  
+
   .bg-gradient-mystic {
     background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
   }
@@ -150,18 +121,322 @@ All colors MUST be HSL.
     background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--card)));
   }
 
-  /* Fix for gradient text - ensure bg-clip-text works properly */
   .bg-clip-text {
     -webkit-background-clip: text !important;
     background-clip: text !important;
   }
 
-  /* Utility class for gradient text that works properly */
   .text-gradient-mystic {
     background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     display: inline-block;
+  }
+
+  /* Battle Effects */
+  @keyframes shake {
+
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(5px);
+    }
+  }
+
+  .animate-shake {
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+  }
+
+  @keyframes float-up {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateY(-50px) scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  .animate-float-up {
+    animation: float-up 1s ease-out forwards;
+  }
+
+  @keyframes flash-red {
+
+    0%,
+    100% {
+      background-color: transparent;
+    }
+
+    50% {
+      background-color: rgba(255, 0, 0, 0.3);
+    }
+  }
+
+  .animate-flash-red {
+    animation: flash-red 0.3s ease-in-out;
+  }
+
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .animate-dash {
+    stroke-dasharray: 10;
+    stroke-dashoffset: 100;
+    animation: dash 2s linear infinite;
+  }
+
+  /* Spell Animations */
+  @keyframes spell-blast {
+    0% {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+
+    50% {
+      transform: scale(1.5);
+      opacity: 1;
+      filter: hue-rotate(0deg);
+    }
+
+    100% {
+      transform: scale(2);
+      opacity: 0;
+      filter: hue-rotate(90deg);
+    }
+  }
+
+  .animate-spell-blast {
+    animation: spell-blast 0.8s ease-out forwards;
+  }
+
+  @keyframes spell-prism {
+    0% {
+      transform: rotate(0deg) scale(0.5);
+      opacity: 0;
+    }
+
+    50% {
+      opacity: 1;
+    }
+
+    100% {
+      transform: rotate(180deg) scale(2);
+      opacity: 0;
+    }
+  }
+
+  .animate-spell-prism {
+    animation: spell-prism 1s ease-out forwards;
+    background: conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red);
+    border-radius: 50%;
+  }
+
+  @keyframes spell-heal {
+    0% {
+      transform: translateY(0) scale(0.5);
+      opacity: 0;
+    }
+
+    50% {
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateY(-50px) scale(1.2);
+      opacity: 0;
+    }
+  }
+
+  .animate-spell-heal {
+    animation: spell-heal 1s ease-out forwards;
+    color: #4ade80;
+  }
+
+  @keyframes spell-wave {
+    0% {
+      transform: translateX(-50px) scaleY(0.5);
+      opacity: 0;
+    }
+
+    50% {
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateX(50px) scaleY(1.5);
+      opacity: 0;
+    }
+  }
+
+  .animate-spell-wave {
+    animation: spell-wave 0.8s ease-in-out forwards;
+  }
+
+  @keyframes spell-lightning {
+    0% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    10%,
+    30%,
+    50% {
+      opacity: 1;
+      filter: brightness(2);
+    }
+
+    20%,
+    40% {
+      opacity: 0.5;
+    }
+
+    100% {
+      opacity: 0;
+      transform: scale(1.5);
+    }
+  }
+
+  .animate-spell-lightning {
+    animation: spell-lightning 0.6s steps(5) forwards;
+  }
+
+  /* Battle Character Animations */
+  @keyframes idle-float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-idle {
+    animation: idle-float 3s ease-in-out infinite;
+  }
+
+  @keyframes attack-lunge-right {
+    0% {
+      transform: translateX(0) scale(1);
+    }
+
+    40% {
+      transform: translateX(-20px) scale(0.9);
+    }
+
+    60% {
+      transform: translateX(100px) scale(1.1);
+    }
+
+    100% {
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  .animate-attack-right {
+    animation: attack-lunge-right 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes attack-lunge-left {
+    0% {
+      transform: translateX(0) scale(1);
+    }
+
+    40% {
+      transform: translateX(20px) scale(0.9);
+    }
+
+    60% {
+      transform: translateX(-100px) scale(1.1);
+    }
+
+    100% {
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  .animate-attack-left {
+    animation: attack-lunge-left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes damage-hit {
+    0% {
+      filter: brightness(1) hue-rotate(0deg);
+      transform: scale(1);
+    }
+
+    20% {
+      filter: brightness(2) hue-rotate(-30deg) sepia(1) saturate(5) hue-rotate(-50deg);
+      transform: scale(0.9);
+    }
+
+    40% {
+      transform: translate(-5px, 5px);
+    }
+
+    60% {
+      transform: translate(5px, -5px);
+    }
+
+    80% {
+      transform: translate(-5px, -5px);
+    }
+
+    100% {
+      filter: brightness(1) hue-rotate(0deg);
+      transform: scale(1);
+    }
+  }
+
+  .animate-damage {
+    animation: damage-hit 0.5s ease-out;
+  }
+
+  /* Magic Particles */
+  .particle {
+    position: absolute;
+    pointer-events: none;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  @keyframes particle-explode {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translate(var(--tx), var(--ty)) scale(0);
+      opacity: 0;
+    }
+  }
+
+  .animate-particle {
+    animation: particle-explode 0.8s ease-out forwards;
   }
 }
