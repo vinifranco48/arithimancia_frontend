@@ -1,73 +1,254 @@
-# Welcome to your Lovable project
+# Arithimancia - Frontend
 
-## Project info
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)
+![React](https://img.shields.io/badge/React-18.3-61dafb)
+![Vite](https://img.shields.io/badge/Vite-5.4-646cff)
+![Tailwind](https://img.shields.io/badge/Tailwind-3.4-38bdf8)
 
-**URL**: https://lovable.dev/projects/439b8e7c-6c11-4fd8-9590-25dd403f32d8
+**Arithimancia** é um RPG educacional que transforma o aprendizado de matemática em uma aventura épica. Os jogadores assumem o papel de Reconstrutores, heróis que utilizam o poder dos números para restaurar a realidade fragmentada.
 
-## How can I edit this code?
+## 📖 Sobre o Projeto
 
-There are several ways of editing your application.
+Este é o frontend do Arithimancia, uma aplicação web moderna construída com React e TypeScript que oferece:
 
-**Use Lovable**
+- 🎮 Sistema de combate baseado em resolução de problemas matemáticos
+- ⚔️ Batalhas épicas contra monstros usando cálculos como armas
+- 🏫 Escolas de magia matemática (Álgebra, Geometria, Teoria dos Números, Trigonometria)
+- 📊 Sistema de progressão com níveis, experiência e estatísticas
+- 🎒 Inventário e sistema de itens
+- 🏆 Ranking global de jogadores
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/439b8e7c-6c11-4fd8-9590-25dd403f32d8) and start prompting.
+## 🚀 Tecnologias
 
-Changes made via Lovable will be committed automatically to this repo.
+### Core
+- **React 18.3** - Biblioteca UI
+- **TypeScript 5.8** - Tipagem estática
+- **Vite 5.4** - Build tool e dev server
+- **React Router DOM 6** - Roteamento
 
-**Use your preferred IDE**
+### UI & Styling
+- **Tailwind CSS 3.4** - Framework CSS utility-first
+- **shadcn/ui** - Componentes acessíveis e customizáveis
+- **Radix UI** - Primitivos de UI headless
+- **Lucide React** - Ícones
+- **Sonner** - Notificações toast
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Estado e Dados
+- **TanStack Query (React Query)** - Gerenciamento de estado do servidor
+- **Axios** - Cliente HTTP
+- **Zod** - Validação de schemas
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Outras
+- **React Hook Form** - Gerenciamento de formulários
+- **date-fns** - Manipulação de datas
+- **Recharts** - Gráficos e visualizações
 
-Follow these steps:
+## 📁 Estrutura do Projeto
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```
+arithimancia_frontend/
+├── src/
+│   ├── components/          # Componentes reutilizáveis
+│   │   ├── ui/             # Componentes shadcn/ui
+│   │   └── game/           # Componentes específicos do jogo
+│   │       └── Battle.tsx  # Sistema de batalha
+│   ├── contexts/           # Contextos React
+│   │   └── AuthContext.tsx # Contexto de autenticação
+│   ├── pages/              # Páginas da aplicação
+│   │   ├── Auth.tsx        # Login/Registro
+│   │   ├── Characters.tsx  # Seleção de personagens
+│   │   ├── CharacterCreate.tsx
+│   │   ├── Game.tsx        # Jogo principal
+│   │   ├── Profile.tsx     # Perfil do usuário
+│   │   └── NotFound.tsx    # 404
+│   ├── services/           # Serviços e API
+│   │   └── api.ts          # Cliente API e serviços
+│   ├── types/              # Tipos TypeScript
+│   │   └── api.ts          # Tipos de dados da API
+│   ├── lib/                # Utilitários
+│   ├── App.tsx             # Componente raiz
+│   └── main.tsx            # Entry point
+├── public/                 # Arquivos estáticos
+├── index.html
+├── vite.config.ts
+├── tailwind.config.ts
+└── package.json
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🛠️ Instalação e Execução
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Pré-requisitos
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+- Node.js 20.x ou superior
+- npm ou yarn
+
+### Passos
+
+1. **Clone o repositório**
+```bash
+git clone <repository-url>
+cd arithimancia/arithimancia_frontend
+```
+
+2. **Instale as dependências**
+```bash
+npm install
+```
+
+3. **Configure as variáveis de ambiente**
+
+O projeto se conecta à API hospedada no AWS Lambda. A URL da API está hardcoded em `src/services/api.ts`:
+```typescript
+const API_BASE_URL = 'https://d75p4b63x4.execute-api.us-east-2.amazonaws.com/api/v1';
+```
+
+4. **Execute em modo desenvolvimento**
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+A aplicação estará disponível em `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+5. **Build para produção**
+```bash
+npm run build
+```
 
-**Use GitHub Codespaces**
+Os arquivos de build serão gerados em `dist/`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🎮 Features Principais
 
-## What technologies are used for this project?
+### Autenticação
+- Sistema completo de login/registro
+- Validação de formulários com feedback visual
+- Gerenciamento de tokens JWT (access + refresh)
+- Interceptor Axios para refresh automático de tokens
+- Proteção de rotas autenticadas
 
-This project is built with:
+### Gerenciamento de Personagens
+- Criação de até 3 personagens por jogador
+- Seleção de escola mágica matemática
+- Visualização de estatísticas (HP, XP, Gold, Level)
+- Sistema de progressão e níveis
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Sistema de Batalha
+- Interface de batalha imersiva e animada
+- Resolução de problemas matemáticos em tempo real
+- Animações de ataque/dano
+- Cálculo de dano baseado em precisão e velocidade
+- Progressão através de múltiplos problemas por combate
+- Log de combate em tempo real
 
-## How can I deploy this project?
+### Sistema de Progresso
+- Experiência e níveis
+- Estatísticas detalhadas do personagem
+- Histórico de conquistas
+- Ranking global
 
-Simply open [Lovable](https://lovable.dev/projects/439b8e7c-6c11-4fd8-9590-25dd403f32d8) and click on Share -> Publish.
+## 🔌 Integração com API
 
-## Can I connect a custom domain to my Lovable project?
+A aplicação se comunica com a API backend através de serviços organizados em `src/services/api.ts`:
 
-Yes, you can!
+### Serviços Disponíveis
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+#### `authService`
+- `login()` - Autenticação
+- `register()` - Criação de conta
+- `logout()` - Encerrar sessão
+- `getMe()` - Dados do usuário atual
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+#### `characterService`
+- `getCharacters()` - Lista personagens
+- `createCharacter()` - Criar personagem
+- `deleteCharacter()` - Deletar personagem
+- `getCharacterStats()` - Estatísticas detalhadas
+
+#### `gameService`
+- `startEncounter()` - Iniciar combate
+- `solveProblem()` - Resolver problema matemático
+- `fleeFromEncounter()` - Fugir do combate
+- `getActiveEncounters()` - Combates ativos
+- `getSchools()` - Escolas disponíveis
+
+### Interceptors
+
+**Request Interceptor**: Adiciona token de autenticação em todas as requisições
+
+**Response Interceptor**:
+- Retry automático para erros 429 (Rate Limiting) com backoff exponencial
+- Refresh automático de token expirado
+- Exclusão de endpoints de autenticação do fluxo de refresh
+
+## 🎨 Tema e Estilo
+
+O projeto usa um tema dark customizado com gradientes místicos:
+
+- **Cores primárias**: Roxo/Violeta (#7c3aed, #8b5cf6)
+- **Backgrounds**: Dark (#0f0b15, #1a1625)
+- **Gradientes**:
+  - `bg-gradient-void` - Background principal
+  - `bg-gradient-mystic` - Botões e destaques
+
+## 🧪 Validação
+
+Todas as entradas de usuário são validadas usando **Zod** tanto no frontend quanto no backend para garantir consistência:
+
+- Validação de formulários
+- Validação de respostas da API
+- Tipos TypeScript inferidos automaticamente dos schemas
+
+## 📱 Responsividade
+
+A interface é totalmente responsiva e otimizada para:
+- Desktop (1920px+)
+- Tablets (768px - 1024px)
+- Mobile (320px - 767px)
+
+## 🔒 Segurança
+
+- Tokens JWT armazenados em localStorage
+- Refresh automático antes da expiração
+- Proteção CSRF através de tokens
+- Validação client-side e server-side
+- Rate limiting com retry exponencial
+
+## 🚀 Deploy
+
+O projeto pode ser deployado em qualquer serviço de hospedagem estática:
+
+- Vercel
+- Netlify
+- AWS S3 + CloudFront
+- GitHub Pages
+
+Basta executar `npm run build` e fazer upload da pasta `dist/`
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Por favor:
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto é licenciado sob a licença MIT.
+
+## 👥 Autores
+
+Desenvolvido como parte do projeto Arithimancia - RPG Educacional de Matemática
+
+## 🐛 Bugs Conhecidos
+
+Nenhum bug crítico conhecido no momento. Reporte problemas na aba Issues.
+
+## 📞 Suporte
+
+Para suporte e dúvidas, abra uma issue no GitHub.
+
+---
+
+**Arithimancia** - Onde a matemática se torna magia ✨🔢
