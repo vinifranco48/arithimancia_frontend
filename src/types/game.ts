@@ -6,8 +6,22 @@ export interface Character {
   level: number;
   hp: number;
   maxHp: number;
+  mana: number;
+  maxMana: number;
   power: number;
   experience: number;
+}
+
+export interface Spell {
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  type: 'damage' | 'heal' | 'buff';
+  value: number; // Damage multiplier or heal amount
+  school: School;
+  icon: string; // Emoji or icon name
+  animation: string; // CSS class for animation
 }
 
 export interface Enemy {
@@ -25,13 +39,14 @@ export interface MathChallenge {
   answer: number;
   difficulty: 'easy' | 'medium' | 'hard';
   school?: School;
+  topic?: string;
 }
 
-export type GameState = 
-  | 'intro' 
-  | 'character_creation' 
-  | 'exploration' 
-  | 'battle' 
-  | 'victory' 
+export type GameState =
+  | 'intro'
+  | 'character_creation'
+  | 'exploration'
+  | 'battle'
+  | 'victory'
   | 'defeat'
   | 'story';
