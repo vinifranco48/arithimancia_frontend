@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { Sword, Skull } from 'lucide-react';
+import { processBattleAnswer, ChallengeAnswer } from '@/utils/localGameEngine';
 
 interface BattleProps {
   character: Character;
@@ -14,9 +15,10 @@ interface BattleProps {
   onVictory: (rewards: any) => void;
   onDefeat: () => void;
   onUpdateCharacter: (character: Character) => void;
+  nodeChallenge?: ChallengeAnswer; // Optional challenge data from kingdom node for local validation
 }
 
-export const Battle = ({ character, encounter, onVictory, onDefeat, onUpdateCharacter }: BattleProps) => {
+export const Battle = ({ character, encounter, onVictory, onDefeat, onUpdateCharacter, nodeChallenge }: BattleProps) => {
   const [currentEncounter, setCurrentEncounter] = useState<Encounter>(encounter);
   const [playerAnswer, setPlayerAnswer] = useState('');
   const [battleLog, setBattleLog] = useState<string[]>([]);
@@ -27,6 +29,12 @@ export const Battle = ({ character, encounter, onVictory, onDefeat, onUpdateChar
   // Animation States
   const [playerAction, setPlayerAction] = useState<'idle' | 'attack' | 'hit'>('idle');
   const [enemyAction, setEnemyAction] = useState<'idle' | 'attack' | 'hit'>('idle');
+
+  // Debug: Log challenge data
+  useEffect(() => {
+    console.log('🎮 Battle Component - Node Challenge:', nodeChallenge);
+    console.log('🎮 Battle Component - Encounter Problem:', encounter.problem);
+  }, [nodeChallenge, encounter.problem]);
 
   useEffect(() => {
     setStartTime(Date.now());
@@ -54,7 +62,24 @@ export const Battle = ({ character, encounter, onVictory, onDefeat, onUpdateChar
     const timeTaken = (Date.now() - startTime) / 1000; // seconds
 
     try {
-      const result = await gameService.solveProblem(currentEncounter.id, playerAnswer, timeTaken);
+      let result;
+
+      // Use local validation if nodeChallenge is provided
+      if (nodeChallenge) {
+        // Local validation mode - bypass API
+        result = processBattleAnswer(
+          playerAnswer,
+          nodeChallenge,
+          character,
+          currentEncounter.monster.currentHealth,
+          currentEncounter.monster.maxHealth,
+          currentEncounter.monster.level,
+          timeTaken
+        );
+      } else {
+        // API validation mode - fallback to API
+        result = await gameService.solveProblem(currentEncounter.id, playerAnswer, timeTaken);
+      }
 
       if (result.correct) {
         // Player Attack Animation
@@ -69,12 +94,7 @@ export const Battle = ({ character, encounter, onVictory, onDefeat, onUpdateChar
           setEnemyAction('hit');
           setTimeout(() => setEnemyAction('idle'), 500);
 
-          // Update local enemy health for visual feedback (approximate or wait for next encounter state)
-          // The API doesn't return the new enemy health in the solve response directly in the example, 
-          // but we can infer or it might be in the full response. 
-          // Actually the example shows "encounterStatus": "VICTORY" or "IN_PROGRESS".
-          // If IN_PROGRESS, we might need to fetch the encounter again or just rely on the damage.
-          // Let's assume we subtract damage locally for now.
+          // Update local enemy health
           setCurrentEncounter(prev => ({
             ...prev,
             monster: {
@@ -90,13 +110,23 @@ export const Battle = ({ character, encounter, onVictory, onDefeat, onUpdateChar
             // Merge updates
             onUpdateCharacter({ ...character, ...result.characterUpdates });
           }
-          setTimeout(() => onVictory(result.rewards), 2000);
+
+          // Show level up message if applicable
+          if (result.rewards?.levelUp) {
+            toast.success(`Subiu de nível! Agora você é nível ${result.rewards.levelUp.newLevel}!`);
+          }
+
+          setTimeout(() => onVictory(result.rewards || {}), 2000);
         } else if (result.nextProblem) {
-          // Update problem
+          // Update problem (API mode only)
           setCurrentEncounter(prev => ({
             ...prev,
             problem: result.nextProblem
           }));
+          setPlayerAnswer('');
+          setStartTime(Date.now());
+        } else {
+          // Clear answer for next round (local mode)
           setPlayerAnswer('');
           setStartTime(Date.now());
         }
@@ -120,14 +150,24 @@ export const Battle = ({ character, encounter, onVictory, onDefeat, onUpdateChar
             if (result.characterUpdates) {
               onUpdateCharacter({ ...character, ...result.characterUpdates });
             }
+
+            // Check for defeat
+            if (result.encounterStatus === 'DEFEAT') {
+              setTimeout(() => onDefeat(), 1000);
+            }
           }, 400);
         }
 
         if (result.nextProblem) {
+          // Update problem (API mode only)
           setCurrentEncounter(prev => ({
             ...prev,
             problem: result.nextProblem
           }));
+          setPlayerAnswer('');
+          setStartTime(Date.now());
+        } else {
+          // Clear answer for next round (local mode)
           setPlayerAnswer('');
           setStartTime(Date.now());
         }

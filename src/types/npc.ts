@@ -38,4 +38,10 @@ export interface MapNode {
     xp: number;
     gold?: number;
   };
+  challenge?: {
+    question: string;
+    answer: number | string;
+    hint?: string;
+    difficulty?: 'easy' | 'medium' | 'hard';
+  };
 }

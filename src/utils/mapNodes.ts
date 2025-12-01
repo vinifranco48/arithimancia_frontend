@@ -25,7 +25,9 @@ export const generateMapNodes = (kingdom: School, currentLevel: number): MapNode
     locked: node.locked,
     rewards: node.rewards,
     // Busca o NPC se o nó for do tipo NPC
-    npc: node.npcId ? getNPCById(kingdom, node.npcId) : undefined
+    npc: node.npcId ? getNPCById(kingdom, node.npcId) : undefined,
+    // Inclui os dados do challenge para validação local
+    challenge: node.challenge
   }));
 };
 

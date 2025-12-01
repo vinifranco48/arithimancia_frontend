@@ -204,6 +204,7 @@ const Game = () => {
         onVictory={handleVictory}
         onDefeat={handleDefeat}
         onUpdateCharacter={handleUpdateCharacter}
+        nodeChallenge={currentNode?.challenge}
       />
     );
   }
