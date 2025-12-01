@@ -3,69 +3,73 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { School } from '@/types/game';
 import { Sparkles, Swords, LogOut, User } from 'lucide-react';
-
-interface Character {
-  id: string;
-  name: string;
-  school: School;
-  level: number;
-  hp: number;
-  maxHp: number;
-  experience: number;
-  gold: number;
-  location: string;
-}
+import { characterService } from '@/services/api';
+import { Character, School } from '@/types/api';
+import { toast } from 'sonner';
 
 export default function Characters() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simular carregamento de personagens
-    const savedChars = localStorage.getItem('arithimancia_characters');
-    if (savedChars) {
-      setCharacters(JSON.parse(savedChars));
-    }
+    loadCharacters();
   }, []);
+
+  const loadCharacters = async () => {
+    try {
+      const data = await characterService.getCharacters();
+      setCharacters(data);
+    } catch (error) {
+      console.error('Failed to load characters:', error);
+      toast.error('Erro ao carregar personagens');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCreateCharacter = () => {
     navigate('/character/create');
   };
 
   const handlePlayCharacter = (character: Character) => {
-    localStorage.setItem('current_character', JSON.stringify(character));
-    // Ir direto para o jogo - o reino já foi escolhido ao criar o personagem
+    localStorage.setItem('current_character_id', character.id.toString());
     navigate('/game');
   };
 
-  const handleDeleteCharacter = (id: string) => {
-    const updatedChars = characters.filter(c => c.id !== id);
-    setCharacters(updatedChars);
-    localStorage.setItem('arithimancia_characters', JSON.stringify(updatedChars));
+  const handleDeleteCharacter = async (id: number) => {
+    if (!confirm('Tem certeza que deseja deletar este personagem?')) return;
+
+    try {
+      await characterService.deleteCharacter(id);
+      setCharacters(characters.filter(c => c.id !== id));
+      toast.success('Personagem deletado com sucesso');
+    } catch (error) {
+      toast.error('Erro ao deletar personagem');
+    }
   };
 
-  const getSchoolColor = (school: School) => {
-    const colors = {
-      algebrista: 'from-purple-500 to-violet-600',
-      geometra: 'from-blue-500 to-cyan-600',
-      trigonometra: 'from-pink-500 to-rose-600',
-      numerologo: 'from-amber-500 to-orange-600',
-    };
-    return colors[school];
+  const getSchoolColor = (schoolName?: string) => {
+    if (!schoolName) return 'from-gray-500 to-gray-600';
+
+    const lowerName = schoolName.toLowerCase();
+    if (lowerName.includes('álgebra') || lowerName.includes('algebra')) return 'from-purple-500 to-violet-600';
+    if (lowerName.includes('geometria')) return 'from-blue-500 to-cyan-600';
+    if (lowerName.includes('trigonometria')) return 'from-pink-500 to-rose-600';
+    if (lowerName.includes('número') || lowerName.includes('numero')) return 'from-amber-500 to-orange-600';
+
+    return 'from-gray-500 to-gray-600';
   };
 
-  const getSchoolName = (school: School) => {
-    const names = {
-      algebrista: 'Algebrista',
-      geometra: 'Geômetra',
-      trigonometra: 'Trigonômetra',
-      numerologo: 'Numerólogo',
-    };
-    return names[school];
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-void flex items-center justify-center">
+        <div className="text-primary animate-pulse">Carregando personagens...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-void p-6">
@@ -108,8 +112,8 @@ export default function Characters() {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="text-2xl font-bold text-foreground">{character.name}</h3>
-                  <p className={`text-sm font-medium bg-gradient-to-r ${getSchoolColor(character.school)} bg-clip-text text-transparent`}>
-                    {getSchoolName(character.school)}
+                  <p className={`text-sm font-medium bg-gradient-to-r ${getSchoolColor(character.school?.name)} bg-clip-text text-transparent`}>
+                    {character.school?.name || 'Sem Escola'}
                   </p>
                 </div>
                 <div className="text-right">
@@ -121,11 +125,11 @@ export default function Characters() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">HP:</span>
-                  <span className="text-foreground">{character.hp}/{character.maxHp}</span>
+                  <span className="text-foreground">{character.currentHealth}/{character.maxHealth}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">XP:</span>
-                  <span className="text-foreground">{character.experience}</span>
+                  <span className="text-foreground">{character.experiencePoints}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Ouro:</span>
@@ -133,7 +137,7 @@ export default function Characters() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Local:</span>
-                  <span className="text-foreground text-xs">{character.location}</span>
+                  <span className="text-foreground text-xs">{character.location?.name || 'Desconhecido'}</span>
                 </div>
               </div>
 
@@ -172,7 +176,7 @@ export default function Characters() {
           )}
         </div>
 
-        {characters.length === 0 && (
+        {characters.length === 0 && !isLoading && (
           <div className="text-center py-12">
             <p className="text-muted-foreground mb-4">
               Você ainda não possui personagens. Crie seu primeiro Reconstrutor!

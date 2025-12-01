@@ -1,86 +1,91 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { School } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { ArrowLeft } from 'lucide-react';
+import { gameService, characterService } from '@/services/api';
+import { School } from '@/types/api';
 
 export default function CharacterCreate() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
-  const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
+  const [selectedSchool, setSelectedSchool] = useState<number | null>(null);
+  const [schools, setSchools] = useState<School[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const schools = [
-    {
-      id: 'algebrista' as School,
-      name: 'Algebrista',
-      motto: 'Pelos Axiomas da Ordem',
-      description: 'Mestres das equações e do equilíbrio matemático',
-      icon: '⚖️',
-      color: 'from-purple-500 to-violet-600',
-    },
-    {
-      id: 'geometra' as School,
-      name: 'Geômetra',
-      motto: 'Pela Harmonia das Formas',
-      description: 'Arquitetos da realidade e das estruturas espaciais',
-      icon: '📐',
-      color: 'from-blue-500 to-cyan-600',
-    },
-    {
-      id: 'trigonometra' as School,
-      name: 'Trigonômetra',
-      motto: 'Pelos Ciclos Eternos',
-      description: 'Guardiões dos padrões e ritmos cósmicos',
-      icon: '〰️',
-      color: 'from-pink-500 to-rose-600',
-    },
-    {
-      id: 'numerologo' as School,
-      name: 'Numerólogo',
-      motto: 'Pela Verdade dos Números',
-      description: 'Sábios dos números primos e sequências sagradas',
-      icon: '🔢',
-      color: 'from-amber-500 to-orange-600',
-    },
-  ];
+  useEffect(() => {
+    loadSchools();
+  }, []);
 
-  const handleSubmit = () => {
+  const loadSchools = async () => {
+    try {
+      const data = await gameService.getSchools();
+      setSchools(data);
+    } catch (error) {
+      console.error('Failed to load schools:', error);
+      toast.error('Erro ao carregar escolas');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getSchoolDetails = (schoolName: string) => {
+    const lowerName = schoolName.toLowerCase();
+    if (lowerName.includes('álgebra') || lowerName.includes('algebra')) {
+      return {
+        icon: '⚖️',
+        color: 'from-purple-500 to-violet-600',
+      };
+    }
+    if (lowerName.includes('geometria')) {
+      return {
+        icon: '📐',
+        color: 'from-blue-500 to-cyan-600',
+      };
+    }
+    if (lowerName.includes('trigonometria')) {
+      return {
+        icon: '〰️',
+        color: 'from-pink-500 to-rose-600',
+      };
+    }
+    if (lowerName.includes('número') || lowerName.includes('numero')) {
+      return {
+        icon: '🔢',
+        color: 'from-amber-500 to-orange-600',
+      };
+    }
+    return {
+      icon: '🎓',
+      color: 'from-gray-500 to-gray-600',
+    };
+  };
+
+  const handleSubmit = async () => {
     if (!name || !selectedSchool) {
       toast.error('Preencha o nome e escolha uma escola');
       return;
     }
 
-    // Simular criação de personagem
-    const newCharacter = {
-      id: 'char-' + Math.random().toString(36).substr(2, 9),
-      name,
-      school: selectedSchool,
-      level: 1,
-      hp: 100,
-      maxHp: 100,
-      experience: 0,
-      gold: 100,
-      location: 'Biblioteca de Alexandria Numérica',
-    };
-
-    // Salvar no localStorage
-    const savedChars = localStorage.getItem('arithimancia_characters');
-    const characters = savedChars ? JSON.parse(savedChars) : [];
-    
-    if (characters.length >= 3) {
-      toast.error('Máximo de 3 personagens atingido');
-      return;
+    try {
+      await characterService.createCharacter(name, selectedSchool);
+      toast.success('Personagem criado com sucesso!');
+      navigate('/characters');
+    } catch (error: any) {
+      const message = error.response?.data?.error?.message || 'Erro ao criar personagem';
+      toast.error(message);
     }
-
-    characters.push(newCharacter);
-    localStorage.setItem('arithimancia_characters', JSON.stringify(characters));
-
-    toast.success('Personagem criado com sucesso!');
-    navigate('/characters');
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-void flex items-center justify-center">
+        <div className="text-primary animate-pulse">Carregando escolas...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-void p-6">
@@ -118,30 +123,35 @@ export default function CharacterCreate() {
           <div className="space-y-4">
             <label className="text-sm font-medium text-foreground">Escolha sua Escola</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {schools.map((school) => (
-                <Card
-                  key={school.id}
-                  className={`p-6 cursor-pointer transition-all ${
-                    selectedSchool === school.id
-                      ? 'bg-primary/20 border-primary'
-                      : 'bg-card/50 border-primary/20 hover:border-primary/40'
-                  }`}
-                  onClick={() => setSelectedSchool(school.id)}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-4xl">{school.icon}</span>
-                      <div>
-                        <h3 className={`text-xl font-bold bg-gradient-to-r ${school.color} bg-clip-text text-transparent`}>
-                          {school.name}
-                        </h3>
-                        <p className="text-xs text-muted-foreground italic">{school.motto}</p>
+              {schools.map((school) => {
+                const details = getSchoolDetails(school.name);
+                return (
+                  <Card
+                    key={school.id}
+                    className={`p-6 cursor-pointer transition-all ${selectedSchool === school.id
+                        ? 'bg-primary/20 border-primary'
+                        : 'bg-card/50 border-primary/20 hover:border-primary/40'
+                      }`}
+                    onClick={() => setSelectedSchool(school.id)}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-4xl">{details.icon}</span>
+                        <div>
+                          <h3 className={`text-xl font-bold bg-gradient-to-r ${details.color} bg-clip-text text-transparent`}>
+                            {school.name}
+                          </h3>
+                          <p className="text-xs text-muted-foreground italic">{school.axiom}</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-foreground/80">{school.description}</p>
+                      <div className="text-xs text-primary mt-2">
+                        Bônus: +{school.bonusValue} {school.bonusType}
                       </div>
                     </div>
-                    <p className="text-sm text-foreground/80">{school.description}</p>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           </div>
 

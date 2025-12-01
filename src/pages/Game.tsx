@@ -7,116 +7,98 @@ import { VictoryScreen } from '@/components/game/VictoryScreen';
 import { DefeatScreen } from '@/components/game/DefeatScreen';
 import { DuolingoMap } from '@/components/game/DuolingoMap';
 import { NPCDialogue } from '@/components/game/NPCDialogue';
-import { Character, Enemy, GameState, School } from '@/types/game';
+import { Character, Encounter } from '@/types/api';
 import { MapNode } from '@/types/npc';
 import { generateMapNodes } from '@/utils/mapNodes';
-import { generateEnemyForKingdom } from '@/data/kingdoms';
 import { toast } from 'sonner';
+import { characterService, gameService } from '@/services/api';
+
+type GameState = 'intro' | 'exploration' | 'battle' | 'victory' | 'defeat' | 'story';
 
 const Game = () => {
   const navigate = useNavigate();
   const [gameState, setGameState] = useState<GameState>('intro');
   const [character, setCharacter] = useState<Character | null>(null);
-  const [currentEnemy, setCurrentEnemy] = useState<Enemy | null>(null);
-  const [encounterNumber, setEncounterNumber] = useState(0);
-  const [storyChapter, setStoryChapter] = useState(0);
+  const [currentEncounter, setCurrentEncounter] = useState<Encounter | null>(null);
   const [mapNodes, setMapNodes] = useState<MapNode[]>([]);
   const [currentNode, setCurrentNode] = useState<MapNode | null>(null);
   const [showMap, setShowMap] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Carregar personagem selecionado
-    const savedChar = localStorage.getItem('current_character');
-    if (savedChar) {
-      const char = JSON.parse(savedChar);
-      const loadedChar = {
-        name: char.name,
-        school: char.school,
-        level: char.level,
-        hp: char.hp,
-        maxHp: char.maxHp,
-        power: 15,
-        experience: char.experience,
-      };
-      setCharacter(loadedChar);
-      // Usar o reino/escola do personagem para gerar os nós corretos
-      setMapNodes(generateMapNodes(loadedChar.school, loadedChar.level));
-      setShowMap(true);
-    }
-  }, []);
+    const initGame = async () => {
+      const charId = localStorage.getItem('current_character_id');
+      if (!charId) {
+        navigate('/characters');
+        return;
+      }
 
-  const handleCharacterCreation = (name: string, school: School) => {
-    const newCharacter: Character = {
-      name,
-      school,
-      level: 1,
-      hp: 100,
-      maxHp: 100,
-      power: 15,
-      experience: 0,
+      try {
+        // Load Character
+        const charData = await characterService.getCharacter(parseInt(charId));
+        setCharacter(charData);
+
+        // Check for active encounters
+        const activeEncounters = await gameService.getActiveEncounters(charData.id);
+        if (activeEncounters && activeEncounters.length > 0) {
+          setCurrentEncounter(activeEncounters[0]);
+          setGameState('battle');
+          setShowMap(false);
+        } else {
+          // Generate Map (Visual only for now, triggers API encounters)
+          // We need to map API School to the local School type expected by generateMapNodes if possible
+          // Or just cast it if names match somewhat, or default.
+          // The local generateMapNodes expects a string. API returns object.
+          // We'll use the school name or a default.
+          const schoolName = charData.school?.name || 'algebrista';
+          // Simple mapping or just pass a valid string if generateMapNodes is robust
+          // Let's assume we can pass 'algebrista' as fallback
+          setMapNodes(generateMapNodes('algebrista', charData.level));
+          setGameState('exploration');
+          setShowMap(true);
+        }
+      } catch (error) {
+        console.error('Failed to initialize game:', error);
+        toast.error('Erro ao carregar jogo');
+        navigate('/characters');
+      } finally {
+        setIsLoading(false);
+      }
     };
-    
-    // Save to localStorage
-    localStorage.setItem('current_character', JSON.stringify(newCharacter));
-    
-    setCharacter(newCharacter);
-    // Gerar nós do reino escolhido
-    setMapNodes(generateMapNodes(school, 1));
-    setGameState('exploration'); // Update game state
-    setShowMap(true);
-    
-    toast.success('Personagem criado!', {
-      description: `Bem-vindo, ${name}!`
-    });
-  };
 
-  const handleNodeSelect = (node: any) => {
+    initGame();
+  }, [navigate]);
+
+  const handleNodeSelect = async (node: any) => {
     setCurrentNode(node);
 
     if (node.type === 'battle' || node.type === 'boss') {
       if (!character) return;
 
-      // Usa o enemyId do nó se disponível, senão gera baseado no tipo
-      const enemyId = node.enemyId || `enemy_${node.id}`;
-      const enemy = generateEnemyForKingdom(character.school, enemyId, character.level);
-      setCurrentEnemy(enemy);
-      setGameState('battle');
-      setShowMap(false);
+      try {
+        const encounter = await gameService.startEncounter(character.id);
+        setCurrentEncounter(encounter);
+        setGameState('battle');
+        setShowMap(false);
+      } catch (error) {
+        toast.error('Erro ao iniciar combate');
+      }
     } else if (node.type === 'npc') {
       setGameState('story');
       setShowMap(false);
     } else if (node.type === 'treasure') {
-      if (character) {
-        const xpGained = node.rewards.xp;
-        handleVictory(xpGained);
-      }
+      toast.info('Tesouro encontrado! (Funcionalidade em desenvolvimento)');
     }
   };
 
-  const handleVictory = (expGained: number) => {
+  const handleVictory = (rewards: any) => {
     if (!character) return;
 
-    const newExp = character.experience + expGained;
-    const newLevel = Math.floor(newExp / 100) + 1;
-    const leveledUp = newLevel > character.level;
+    // Update character locally with rewards if needed, or fetch fresh
+    // The Battle component already calls onUpdateCharacter with updates from solve response
 
-    const updatedCharacter = {
-      ...character,
-      experience: newExp,
-      level: newLevel,
-      hp: character.maxHp,
-      maxHp: leveledUp ? character.maxHp + 20 : character.maxHp,
-      power: leveledUp ? character.power + 5 : character.power,
-    };
-
-    // Save updated character to localStorage
-    localStorage.setItem('current_character', JSON.stringify(updatedCharacter));
-    setCharacter(updatedCharacter);
-
-    if (leveledUp) {
-      toast.success('Subiu de Nível!', {
-        description: `Agora você é nível ${newLevel}! HP e Poder aumentados.`,
-      });
+    if (rewards.experienceGained) {
+      toast.success(`Vitória! +${rewards.experienceGained} XP, +${rewards.goldGained} Ouro`);
     }
 
     setGameState('victory');
@@ -126,84 +108,75 @@ const Game = () => {
     setGameState('defeat');
   };
 
-  const handleContinueAfterVictory = () => {
-    setEncounterNumber(prev => prev + 1);
-    setStoryChapter(prev => prev + 1);
+  const handleContinueAfterVictory = async () => {
     if (character) {
-      setMapNodes(generateMapNodes(character.school, character.level));
+      // Refresh character to get latest stats
+      try {
+        const updatedChar = await characterService.getCharacter(character.id);
+        setCharacter(updatedChar);
+        setMapNodes(generateMapNodes('algebrista', updatedChar.level));
+      } catch (e) {
+        console.error("Failed to refresh character", e);
+      }
     }
     setGameState('exploration');
     setShowMap(true);
     setCurrentNode(null);
+    setCurrentEncounter(null);
   };
 
   const handleNPCComplete = (xpGained: number) => {
-    if (!character) return;
-    
-    const newExp = character.experience + xpGained;
-    const newLevel = Math.floor(newExp / 100) + 1;
-    const leveledUp = newLevel > character.level;
-
-    const updatedCharacter = {
-      ...character,
-      experience: newExp,
-      level: newLevel,
-      hp: character.hp, // Maintain current HP
-      maxHp: leveledUp ? character.maxHp + 20 : character.maxHp,
-      power: leveledUp ? character.power + 5 : character.power,
-    };
-
-    // Save updated character to localStorage
-    localStorage.setItem('current_character', JSON.stringify(updatedCharacter));
-    setCharacter(updatedCharacter);
-
-    if (leveledUp) {
-      toast.success('Subiu de Nível!', {
-        description: `Agora você é nível ${newLevel}! HP e Poder aumentados.`,
-      });
-    }
-
-    setMapNodes(generateMapNodes(updatedCharacter.school, updatedCharacter.level));
+    // Placeholder for NPC interaction
     setShowMap(true);
     setCurrentNode(null);
   };
 
-  const handleRetry = () => {
+  const handleRetry = async () => {
     if (!character) return;
 
-    setCharacter({
-      ...character,
-      hp: character.maxHp,
-    });
-
-    // Regerar o mesmo inimigo do nó atual
-    if (currentNode && (currentNode.type === 'battle' || currentNode.type === 'boss')) {
-      const enemyId = (currentNode as any).enemyId || `enemy_${currentNode.id}`;
-      const enemy = generateEnemyForKingdom(character.school, enemyId, character.level);
-      setCurrentEnemy(enemy);
-    }
-
-    setGameState('battle');
+    // Reload character to reset state if needed or just go back to map
+    // For now, go back to map
+    setGameState('exploration');
+    setShowMap(true);
+    setCurrentEncounter(null);
   };
 
   const handleUpdateCharacter = (updatedCharacter: Character) => {
-    localStorage.setItem('current_character', JSON.stringify(updatedCharacter));
     setCharacter(updatedCharacter);
   };
 
-  const handleBackToMenu = () => {
-    navigate('/characters');
-  };
+  const localCharacter = character ? {
+    name: character.name,
+    school: (character.school?.name.toLowerCase().includes('álgebra') ? 'algebrista' :
+      character.school?.name.toLowerCase().includes('geometria') ? 'geometra' :
+        character.school?.name.toLowerCase().includes('trigonometria') ? 'trigonometra' : 'numerologo') as any,
+    level: character.level,
+    hp: character.currentHealth,
+    maxHp: character.maxHealth,
+    mana: 100,
+    maxMana: 100,
+    power: 15,
+    experience: character.experiencePoints
+  } : null;
 
-  if (gameState === 'intro') {
-    return <CharacterCreation onComplete={handleCharacterCreation} />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0f0b15] flex items-center justify-center">
+        <div className="text-primary animate-pulse">Carregando jogo...</div>
+      </div>
+    );
   }
 
-  if (showMap && character) {
+  if (gameState === 'intro') {
+    // We skip intro now as character is created in previous screen
+    return null;
+  }
+
+  if (showMap && localCharacter) {
     return (
       <DuolingoMap
         nodes={mapNodes}
-        character={character}
+        character={localCharacter}
         onNodeSelect={handleNodeSelect}
         currentNodeId={currentNode?.id}
       />
@@ -223,11 +196,11 @@ const Game = () => {
     );
   }
 
-  if (gameState === 'battle' && character && currentEnemy) {
+  if (gameState === 'battle' && character && currentEncounter) {
     return (
       <Battle
         character={character}
-        enemy={currentEnemy}
+        encounter={currentEncounter}
         onVictory={handleVictory}
         onDefeat={handleDefeat}
         onUpdateCharacter={handleUpdateCharacter}
@@ -235,8 +208,8 @@ const Game = () => {
     );
   }
 
-  if (gameState === 'victory' && character) {
-    return <VictoryScreen character={character} onContinue={handleContinueAfterVictory} />;
+  if (gameState === 'victory' && localCharacter) {
+    return <VictoryScreen character={localCharacter} onContinue={handleContinueAfterVictory} />;
   }
 
   if (gameState === 'defeat') {
