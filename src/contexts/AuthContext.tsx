@@ -1,70 +1,76 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-  username: string;
-  createdAt: string;
-}
+import { authService } from '../services/api';
+import { Player } from '../types/api';
 
 interface AuthContextType {
-  user: User | null;
+  user: Player | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, username: string) => Promise<void>;
-  logout: () => void;
+  register: (username: string, email: string, password: string, passwordConfirmation: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Player | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simular verificação de sessão
-    const savedUser = localStorage.getItem('arithimancia_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    const checkAuth = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        try {
+          const userData = await authService.getMe();
+          setUser(userData);
+        } catch (error) {
+          console.error('Failed to fetch user profile:', error);
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+        }
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Simular login
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const mockUser: User = {
-      id: 'user-' + Math.random().toString(36).substr(2, 9),
-      email,
-      username: email.split('@')[0],
-      createdAt: new Date().toISOString(),
-    };
-    
-    setUser(mockUser);
-    localStorage.setItem('arithimancia_user', JSON.stringify(mockUser));
+    try {
+      const player = await authService.login(email, password);
+      setUser(player);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
   };
 
-  const register = async (email: string, password: string, username: string) => {
-    // Simular registro
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const mockUser: User = {
-      id: 'user-' + Math.random().toString(36).substr(2, 9),
-      email,
-      username,
-      createdAt: new Date().toISOString(),
-    };
-    
-    setUser(mockUser);
-    localStorage.setItem('arithimancia_user', JSON.stringify(mockUser));
+  const register = async (username: string, email: string, password: string, passwordConfirmation: string) => {
+    try {
+      const player = await authService.register(username, email, password, passwordConfirmation);
+      setUser(player);
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('arithimancia_user');
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setUser(null);
+      // LocalStorage cleanup is handled in authService.logout but good to be safe or if it fails
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
