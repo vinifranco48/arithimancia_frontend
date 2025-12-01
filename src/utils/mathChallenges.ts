@@ -23,6 +23,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Resolva: x + ${a} = ${a + b}`,
           answer: b,
           difficulty: 'easy' as const,
+          topic: 'equacao_1_grau_simples'
         };
       },
       // Medium
@@ -34,6 +35,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Resolva: ${a}x + ${b} = ${result}`,
           answer: (result - b) / a,
           difficulty: 'medium' as const,
+          topic: 'equacao_1_grau_composta'
         };
       },
       // Hard
@@ -44,6 +46,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Resolva: x² = ${a * a}`,
           answer: a,
           difficulty: 'hard' as const,
+          topic: 'equacao_2_grau_simples'
         };
       },
     ],
@@ -55,6 +58,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Qual a área de um quadrado com lado ${lado}?`,
           answer: lado * lado,
           difficulty: 'easy' as const,
+          topic: 'area_quadrado'
         };
       },
       // Medium
@@ -65,6 +69,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Área de um triângulo: base ${base}, altura ${altura}`,
           answer: (base * altura) / 2,
           difficulty: 'medium' as const,
+          topic: 'area_triangulo'
         };
       },
       // Hard
@@ -74,6 +79,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Área de um círculo com raio ${raio} (use π=3.14)`,
           answer: parseFloat((Math.PI * raio * raio).toFixed(2)),
           difficulty: 'hard' as const,
+          topic: 'area_circulo'
         };
       },
     ],
@@ -85,6 +91,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Calcule: ${num} × 5`,
           answer: num * 5,
           difficulty: 'easy' as const,
+          topic: 'multiplicacao_basica'
         };
       },
       // Medium
@@ -96,6 +103,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Quanto é sen(${angle}°)? (aproximado)`,
           answer: sines[angle],
           difficulty: 'medium' as const,
+          topic: 'seno_notavel'
         };
       },
       // Hard
@@ -106,6 +114,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Hipotenusa: catetos ${a} e ${b} (arredonde)`,
           answer: Math.round(Math.sqrt(a * a + b * b)),
           difficulty: 'hard' as const,
+          topic: 'pitagoras_calculo'
         };
       },
     ],
@@ -118,6 +127,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `${num1} + ${num2} = ?`,
           answer: num1 + num2,
           difficulty: 'easy' as const,
+          topic: 'soma_simples'
         };
       },
       // Medium
@@ -129,6 +139,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
             [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47].indexOf(prime) + 1
           ],
           difficulty: 'medium' as const,
+          topic: 'numeros_primos'
         };
       },
       // Hard
@@ -137,6 +148,7 @@ export const generateChallenge = (school: School, level: number): MathChallenge 
           question: `Qual é o 7º número de Fibonacci?`,
           answer: 13,
           difficulty: 'hard' as const,
+          topic: 'fibonacci'
         };
       },
     ],
